@@ -130,7 +130,8 @@ gyro_average_offset_z = rospy.get_param('~gyro_average_offset_z', 0.0)
 #rospy.loginfo("%f %f %f", gyro_average_offset_x, gyro_average_offset_y, gyro_average_offset_z)
 
 pub = rospy.Publisher(topic, Imu, queue_size=1)
-srv = Server(imuConfig, reconfig_callback)  # define dynamic_reconfigure callback
+# define dynamic_reconfigure callback
+srv = Server(imuConfig, reconfig_callback)  
 diag_pub = rospy.Publisher('diagnostics', DiagnosticArray, queue_size=1)
 diag_pub_time = rospy.get_time();
 
@@ -148,9 +149,11 @@ roll=0
 pitch=0
 yaw=0
 seq=0
-accel_factor = 9.806 / 256.0    # sensor reports accel as 256.0 = 1G (9.8m/s^2). Convert to m/s^2.
+# sensor reports accel as 256.0 = 1G (9.8m/s^2). Convert to m/s^2.
+accel_factor = 9.806 / 256.0    
 rospy.loginfo("Giving the razor IMU board 5 seconds to boot...")
-rospy.sleep(5) # Sleep for 5 seconds to wait for the board to boot
+# Sleep for 5 seconds to wait for the board to boot
+rospy.sleep(5) 
 
 ### configure board ###
 #stop datastream
@@ -163,7 +166,8 @@ ser.write(('#o0').encode("utf-8"))
 discard = ser.readlines() 
 
 #set output mode
-ser.write(('#ox').encode("utf-8")) # To start display angle and sensor reading in text
+# To start canvas angle and sensor reading in text
+ser.write(('#ox').encode("utf-8")) 
 
 rospy.loginfo("Writing calibration values to razor IMU board...")
 #set calibration values
@@ -232,10 +236,13 @@ while not rospy.is_shutdown():
         continue
     else:
         errcount = 0
-    line = line.replace("#YPRAG=","")   # Delete "#YPRAG="
+# Delete "#YPRAG="
+    line = line.replace("#YPRAG=","")   
     #f.write(line)                     # Write to the output log file
-    line = line.replace("\r\n","")   # Delete "\r\n"
-    words = line.split(",")    # Fields split
+# Delete "\r\n"
+    line = line.replace("\r\n","")   
+# Fields split
+    words = line.split(",")    
     if len(words) != 9:
         rospy.logwarn("Bad IMU data or bad sync")
         errcount = errcount+1
@@ -287,12 +294,9 @@ while not rospy.is_shutdown():
         diag_msg.name = 'Razor_Imu'
         diag_msg.level = DiagnosticStatus.OK
         diag_msg.message = 'Received AHRS measurement'
-        diag_msg.values.append(KeyValue('roll (deg)',
-                                str(roll*(180.0/math.pi))))
-        diag_msg.values.append(KeyValue('pitch (deg)',
-                                str(pitch*(180.0/math.pi))))
-        diag_msg.values.append(KeyValue('yaw (deg)',
-                                str(yaw*(180.0/math.pi))))
+        diag_msg.values.append(KeyValue('roll (deg)', str(roll*(180.0/math.pi))))
+        diag_msg.values.append(KeyValue('pitch (deg)', str(pitch*(180.0/math.pi))))
+        diag_msg.values.append(KeyValue('yaw (deg)', str(yaw*(180.0/math.pi))))
         diag_msg.values.append(KeyValue('sequence number', str(seq)))
         diag_arr.status.append(diag_msg)
         diag_pub.publish(diag_arr)

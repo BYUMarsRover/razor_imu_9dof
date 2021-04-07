@@ -152,6 +152,8 @@ void draw() {
     fill(0, 255, 255);
     text("MAX NUMBER OF SAMPLES REACHED!", width/2, 0, -250);
     println("MAX NUMBER OF SAMPLES REACHED!");
+    outputCalibration();
+    exit();
   }
  
   pushMatrix(); {
